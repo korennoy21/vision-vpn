@@ -2,6 +2,7 @@ package dev.sever.vpn;
 
 import android.content.Context;
 import org.amnezia.awg.backend.GoBackend;
+import org.amnezia.awg.backend.NoopTunnelActionHandler;
 import org.amnezia.awg.backend.Tunnel;
 import org.amnezia.awg.config.Config;
 import java.io.ByteArrayInputStream;
@@ -19,9 +20,11 @@ public final class AmneziaWgEngine {
         String raw = RoutingConfigInjector.apply(profile.raw, context);
         Config config = Config.parse(new ByteArrayInputStream(raw.getBytes(StandardCharsets.UTF_8)));
         synchronized (LOCK) {
-            if (backend == null) backend = new GoBackend(context.getApplicationContext());
+            if (backend == null) backend = new GoBackend(context.getApplicationContext(), new NoopTunnelActionHandler());
             if (tunnel == null) tunnel = new Tunnel() {
                 @Override public String getName() { return "visionawg"; }
+                @Override public Boolean isIpv4ResolutionPreferred() { return false; }
+                @Override public Boolean isMetered() { return false; }
                 @Override public void onStateChange(State newState) {
                     if (newState == State.UP) VisionState.connected(ProtocolDetector.AMNEZIAWG, "AmneziaWG");
                     else if (VisionState.protocol.equals(ProtocolDetector.AMNEZIAWG)) VisionState.stopped();
