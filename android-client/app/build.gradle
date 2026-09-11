@@ -1,0 +1,25 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'dev.sever.vpn'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'dev.sever.vpn'
+        minSdk 29
+        targetSdk 35
+        versionCode 100
+        versionName '1.0.0'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
+    }
+}
+dependencies {
+    implementation(platform('com.squareup.okhttp3:okhttp-bom:5.3.0'))
+    implementation 'com.squareup.okhttp3:okhttp'
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+    implementation 'com.wireguard.android:tunnel:1.0.20260102'
+    implementation 'com.zaneschepke:amneziawg-android:2.3.7'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+}

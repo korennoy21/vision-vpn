@@ -1,0 +1,33 @@
+name: sever-node
+services:
+  node:
+    build:
+      context: ..
+      dockerfile: ops/Dockerfile
+    image: sever-suite:0.4.0
+    network_mode: host
+    restart: unless-stopped
+    cap_add: [NET_ADMIN]
+    devices: [/dev/net/tun:/dev/net/tun]
+    volumes:
+      - ../node.json:/run/sever/node.json:ro
+    read_only: true
+    tmpfs: [/tmp]
+    entrypoint: [/app/ops/node-entrypoint.sh]
+    logging:
+      driver: json-file
+      options: {max-size: '5m', max-file: '3'}
+  caddy:
+    image: caddy:2.10.2-alpine
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      VPN_DOMAIN: ${VPN_DOMAIN:?Set VPN_DOMAIN}
+      VPN_PORT: ${VPN_PORT:-443}
+    volumes:
+      - ./Caddyfile.node:/etc/caddy/Caddyfile:ro
+      - ../caddy-data:/data
+      - ../caddy-config:/config
+    logging:
+      driver: json-file
+      options: {max-size: '5m', max-file: '3'}

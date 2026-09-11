@@ -1,0 +1,8 @@
+{$PANEL_DOMAIN} {
+    encode gzip
+    header Strict-Transport-Security "max-age=31536000"
+    reverse_proxy 127.0.0.1:8090
+}
+https://{$VPN_DOMAIN}:{$VPN_PORT:443} {
+    reverse_proxy 127.0.0.1:8787
+}

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#04101c">
+  <title>VISION Control</title>
+  <link rel="stylesheet" href="/assets/style.css?v=1.2.0">
+</head>
+<body>
+  <div id="toast" class="toast" hidden></div>
+
+  <section id="login" class="login-shell">
+    <div class="login-glow"></div>
+    <form id="login-form" class="login-card" autocomplete="on">
+      <div class="brand-mark">V</div>
+      <div class="brand"><b>VISION</b><span>CONTROL</span></div>
+      <h1>Панель управления</h1>
+      <p>Серверы, клиенты, маршруты и политики в одном месте.</p>
+      <label>Логин<input name="username" autocomplete="username" required></label>
+      <label>Пароль<input name="password" type="password" autocomplete="current-password" required></label>
+      <button class="primary" type="submit">Войти</button>
+      <div id="login-error" class="error"></div>
+    </form>
+  </section>
+
+  <div id="workspace" class="workspace" hidden>
+    <aside class="sidebar">
+      <div class="side-brand"><div class="brand-mark small">V</div><div><b>VISION</b><span>CONTROL</span></div></div>
+      <nav>
+        <button data-tab="dashboard" class="nav active"><span>◫</span>Обзор</button>
+        <button data-tab="clients" class="nav"><span>◎</span>Клиенты <em id="nav-count">0</em></button>
+        <button data-tab="nodes" class="nav"><span>▤</span>Серверы</button>
+        <button data-tab="telemetry" class="nav"><span>⌁</span>Телеметрия</button>
+        <button data-tab="activity" class="nav"><span>◉</span>Сайты / активность</button>
+        <button data-tab="policies" class="nav"><span>⌘</span>Политики</button>
+        <button data-tab="protocols" class="nav"><span>⚙</span>Протоколы</button>
+        <button data-tab="routing" class="nav"><span>⇄</span>Маршрутизация</button>
+        <button data-tab="dns" class="nav"><span>◇</span>DNS / фильтры</button>
+        <button data-tab="backups" class="nav"><span>▣</span>Резервные копии</button>
+        <button data-tab="access" class="nav"><span>♙</span>Роли / API</button>
+        <button data-tab="events" class="nav"><span>≡</span>Журнал</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="version">VISION Control <span>1.2.0</span></div>
+        <button id="logout" class="ghost">Выйти</button>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div><small>VISION VPN PLATFORM</small><h1 id="page-title">Обзор</h1></div>
+        <div class="top-actions"><span id="updated">—</span><button id="refresh" class="icon-btn">↻</button><button id="add" class="primary compact" hidden></button></div>
+      </header>
+
+      <section id="metrics" class="metrics">
+        <article><span>Активные клиенты</span><strong id="metric-active">0</strong><small>с действующим доступом</small></article>
+        <article><span>Онлайн сейчас</span><strong id="metric-online">—</strong><small>активных туннелей</small></article>
+        <article><span>Серверы</span><strong id="metric-nodes">0 / 0</strong><small>на связи</small></article>
+        <article><span>Состояние</span><strong class="ok">● Online</strong><small>панель доступна</small></article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><div><h2 id="table-title">Состояние сети</h2><p id="table-hint">Управление инфраструктурой VISION</p></div></div>
+        <div id="content"></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="editor">
+    <form id="edit-form" method="dialog" class="modal-card">
+      <div class="modal-head"><h2 id="edit-title"></h2><button type="button" data-close="editor">×</button></div>
+      <div id="fields" class="fields"></div>
+      <div id="edit-error" class="error"></div>
+      <footer><button type="button" class="ghost" data-close="editor">Отмена</button><button type="submit" class="primary">Сохранить</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="secret">
+    <div class="modal-card">
+      <div class="modal-head"><h2 id="secret-title">Данные</h2><button type="button" data-close="secret">×</button></div>
+      <p id="secret-hint"></p>
+      <textarea id="secret-text" rows="8" readonly></textarea>
+      <footer><button id="download-profile" class="ghost" hidden>Скачать профиль</button><button id="copy-secret" class="primary">Скопировать</button></footer>
+    </div>
+  </dialog>
+
+  <dialog id="confirm">
+    <div class="modal-card narrow">
+      <div class="modal-head"><h2 id="confirm-title"></h2><button type="button" data-close="confirm">×</button></div>
+      <p id="confirm-text"></p>
+      <footer><button class="ghost" data-close="confirm">Отмена</button><button id="confirm-action" class="danger">Подтвердить</button></footer>
+    </div>
+  </dialog>
+
+  <script src="/assets/app.js?v=1.2.0"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# Start alongside compose.panel.yml on a single new VPS. One Caddy owns ports 80/443.
+services:
+  node:
+    image: sever-suite:0.4.0
+    network_mode: host
+    restart: unless-stopped
+    cap_add: [NET_ADMIN]
+    devices: [/dev/net/tun:/dev/net/tun]
+    volumes:
+      - ../node.json:/run/sever/node.json:ro
+    read_only: true
+    tmpfs: [/tmp]
+    entrypoint: [/app/ops/node-entrypoint.sh]
+    logging:
+      driver: json-file
+      options: {max-size: '5m', max-file: '3'}
+  caddy:
+    environment:
+      VPN_DOMAIN: ${VPN_DOMAIN:?Set VPN_DOMAIN}
+      VPN_PORT: ${VPN_PORT:-443}
+    volumes:
+      - ./Caddyfile.combined:/etc/caddy/Caddyfile:ro

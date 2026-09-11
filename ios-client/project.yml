@@ -1,0 +1,67 @@
+name: VisionVPN
+options:
+  bundleIdPrefix: app.vision
+  deploymentTarget:
+    iOS: '16.0'
+settings:
+  base:
+    SWIFT_VERSION: '5.0'
+    MARKETING_VERSION: '1.0.0'
+    CURRENT_PROJECT_VERSION: '100'
+    TARGETED_DEVICE_FAMILY: '1,2'
+    CODE_SIGN_STYLE: Automatic
+targets:
+  VisionVPN:
+    type: application
+    platform: iOS
+    sources: [Sever, Shared]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.vision.vpn
+    info:
+      path: Sever/Info.plist
+      properties:
+        CFBundleDisplayName: VISION VPN
+        NSCameraUsageDescription: VISION использует камеру только для сканирования QR-кодов VPN-профилей.
+        UILaunchScreen: {}
+        SeverKeychainGroup: $(AppIdentifierPrefix)app.vision.shared
+    entitlements:
+      path: Sever/Sever.entitlements
+      properties:
+        com.apple.developer.networking.networkextension: [packet-tunnel-provider]
+        keychain-access-groups: ['$(AppIdentifierPrefix)app.vision.shared']
+    dependencies:
+      - target: Tunnel
+      - sdk: NetworkExtension.framework
+      - sdk: Security.framework
+      - sdk: AVFoundation.framework
+  Tunnel:
+    type: app-extension
+    platform: iOS
+    sources: [Tunnel, Shared]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.vision.vpn.tunnel
+        APPLICATION_EXTENSION_API_ONLY: YES
+    info:
+      path: Tunnel/Info.plist
+      properties:
+        CFBundleDisplayName: VISION VPN Tunnel
+        SeverKeychainGroup: $(AppIdentifierPrefix)app.vision.shared
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.networkextension.packet-tunnel
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PacketTunnelProvider
+    entitlements:
+      path: Tunnel/Tunnel.entitlements
+      properties:
+        com.apple.developer.networking.networkextension: [packet-tunnel-provider]
+        keychain-access-groups: ['$(AppIdentifierPrefix)app.vision.shared']
+    dependencies:
+      - sdk: NetworkExtension.framework
+      - sdk: Network.framework
+      - sdk: Security.framework
+schemes:
+  VisionVPN:
+    build:
+      targets:
+        VisionVPN: all

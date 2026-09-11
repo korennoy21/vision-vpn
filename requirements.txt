@@ -1,0 +1,2 @@
+# Tested runtime version. Recheck upstream security advisories before deployment.
+aiohttp==3.13.5

@@ -1,0 +1,25 @@
+__pycache__/
+.venv/
+*.pyc
+*.pem
+users.json
+*.profile.json
+.gradle/
+build/
+local.properties
+*.xcodeproj/
+DerivedData/
+*.xcuserstate
+*.ipa
+*.apk
+
+# Private control-plane state
+data/
+caddy-data/
+caddy-config/
+node.json
+*.env
+*.key
+*.sqlite3*
+backups/
+.sites-runtime/

@@ -1,0 +1,40 @@
+name: sever-control
+services:
+  panel:
+    build:
+      context: ..
+      dockerfile: ops/Dockerfile
+    image: sever-suite:0.4.0
+    user: '10001:10001'
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      PUBLIC_URL: https://${PANEL_DOMAIN:?Set PANEL_DOMAIN}
+    volumes:
+      - ../data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ['CMD', 'python', '-c', "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8090/healthz', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options: {max-size: '5m', max-file: '3'}
+  caddy:
+    image: caddy:2.10.2-alpine
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      PANEL_DOMAIN: ${PANEL_DOMAIN:?Set PANEL_DOMAIN}
+    volumes:
+      - ./Caddyfile.panel:/etc/caddy/Caddyfile:ro
+      - ../caddy-data:/data
+      - ../caddy-config:/config
+    logging:
+      driver: json-file
+      options: {max-size: '5m', max-file: '3'}

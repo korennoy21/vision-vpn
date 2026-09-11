@@ -1,0 +1,16 @@
+**/__pycache__
+.venv
+.git
+.sites-runtime
+data
+caddy-data
+caddy-config
+*.env
+node.json
+*.key
+*.pem
+*.profile.json
+android
+ios
+tests
+docs
