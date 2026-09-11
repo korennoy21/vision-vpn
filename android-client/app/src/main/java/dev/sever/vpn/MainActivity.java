@@ -21,21 +21,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * VISION VPN Android UI v1.1.
- * Visual layer follows the approved Figma redesign while preserving
+ * VISION VPN Android Neon UI v2.0.
+ * Visual layer follows the approved neon/glass product concept while preserving
  * the existing tunnel engines, profile store, routing and handover logic.
  */
 public final class MainActivity extends Activity {
     private static final int VPN_CONSENT = 10, IMPORT_FILE = 11;
 
-    private static final int BG = Color.rgb(4, 13, 23);
-    private static final int SURFACE = Color.rgb(8, 25, 40);
-    private static final int SURFACE_2 = Color.rgb(10, 33, 52);
-    private static final int SURFACE_3 = Color.rgb(13, 42, 65);
-    private static final int BORDER = Color.rgb(25, 63, 91);
-    private static final int BLUE = Color.rgb(36, 169, 255);
+    private static final int BG = Color.rgb(2, 9, 18);
+    private static final int SURFACE = Color.rgb(7, 18, 34);
+    private static final int SURFACE_2 = Color.rgb(11, 27, 49);
+    private static final int SURFACE_3 = Color.rgb(14, 36, 63);
+    private static final int BORDER = Color.rgb(27, 55, 88);
+    private static final int BLUE = Color.rgb(35, 170, 255);
     private static final int BLUE_SOFT = Color.rgb(26, 112, 170);
-    private static final int MINT = Color.rgb(53, 232, 184);
+    private static final int MINT = Color.rgb(42, 236, 184);
     private static final int WARNING = Color.rgb(255, 190, 92);
     private static final int MUTED = Color.rgb(145, 169, 194);
     private static final int MUTED_2 = Color.rgb(92, 121, 149);
@@ -133,56 +133,70 @@ public final class MainActivity extends Activity {
         LinearLayout top = new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL);
         top.setGravity(Gravity.CENTER_VERTICAL);
-        top.setPadding(dp(20), dp(16), dp(18), dp(12));
+        top.setPadding(dp(18), dp(13), dp(16), dp(10));
 
-        TextView mark = text("V", 14, Color.WHITE, true);
+        TextView mark = text("V", 18, Color.WHITE, true);
         mark.setGravity(Gravity.CENTER);
-        mark.setBackground(roundStroke(Color.rgb(13, 63, 94), BLUE_SOFT, 14, 1));
-        top.addView(mark, new LinearLayout.LayoutParams(dp(38), dp(38)));
+        GradientDrawable logo = new GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                new int[] {
+                        Color.rgb(23, 215, 255),
+                        Color.rgb(41, 107, 255),
+                        Color.rgb(116, 61, 255)
+                });
+        logo.setCornerRadius(dp(14));
+        mark.setBackground(logo);
+        mark.setElevation(dp(8));
+        top.addView(mark, new LinearLayout.LayoutParams(dp(42), dp(42)));
 
         LinearLayout brand = new LinearLayout(this);
         brand.setOrientation(LinearLayout.VERTICAL);
-        brand.setPadding(dp(10), 0, 0, 0);
-        brand.addView(text("VISION VPN", 18, Color.WHITE, true));
-        TextView sub = text("PRIVATE • SMART • FAST", 9, MUTED, true);
-        sub.setLetterSpacing(.12f);
+        brand.setPadding(dp(11), 0, 0, 0);
+        brand.addView(text("VISION VPN", 19, Color.WHITE, true));
+        TextView sub = text("Без границ. Всегда с вами.", 10, MUTED, false);
         brand.addView(sub);
         top.addView(brand);
 
         Space spacer = new Space(this);
         top.addView(spacer, new LinearLayout.LayoutParams(0, 1, 1f));
 
-        TextView badge = text("SECURE", 10, MINT, true);
-        badge.setGravity(Gravity.CENTER);
-        badge.setPadding(dp(11), dp(5), dp(11), dp(5));
-        badge.setBackground(roundStroke(Color.rgb(7, 46, 43), Color.rgb(23, 103, 85), 999, 1));
-        top.addView(badge);
+        TextView secure = text(
+                VisionState.running ? "● ЗАЩИЩЕНО" : "● ГОТОВ",
+                9,
+                VisionState.running ? MINT : BLUE,
+                true);
+        secure.setGravity(Gravity.CENTER);
+        secure.setPadding(dp(10), dp(6), dp(10), dp(6));
+        secure.setBackground(roundStroke(
+                VisionState.running ? Color.rgb(4, 45, 40) : Color.rgb(8, 31, 55),
+                VisionState.running ? Color.rgb(17, 105, 86) : Color.rgb(18, 74, 118),
+                999, 1));
+        top.addView(secure);
 
         return top;
     }
 
     private View renderBottomNav() {
-        LinearLayout wrap = new LinearLayout(this);
-        wrap.setOrientation(LinearLayout.VERTICAL);
-        wrap.setPadding(dp(12), dp(8), dp(12), dp(12));
-        wrap.setBackgroundColor(Color.rgb(5, 17, 29));
-
-        View divider = new View(this);
-        divider.setBackgroundColor(Color.rgb(14, 38, 57));
-        wrap.addView(divider, new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dp(1)));
+        LinearLayout outer = new LinearLayout(this);
+        outer.setOrientation(LinearLayout.VERTICAL);
+        outer.setPadding(dp(14), dp(7), dp(14), dp(13));
+        outer.setBackgroundColor(BG);
 
         LinearLayout nav = new LinearLayout(this);
         nav.setOrientation(LinearLayout.HORIZONTAL);
-        nav.setPadding(0, dp(7), 0, 0);
+        nav.setGravity(Gravity.CENTER_VERTICAL);
+        nav.setPadding(dp(5), dp(5), dp(5), dp(5));
+        nav.setBackground(roundStroke(Color.rgb(6, 18, 33), Color.rgb(24, 53, 84), 24, 1));
+        nav.setElevation(dp(8));
 
         addNav(nav, "⌂", "Главная", "home");
-        addNav(nav, "◎", "Профили", "profiles");
+        addNav(nav, "◉", "Профили", "profiles");
         addNav(nav, "⇄", "Маршруты", "routes");
         addNav(nav, "⚙", "Настройки", "settings");
-        wrap.addView(nav);
 
-        return wrap;
+        outer.addView(nav, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(64)));
+        return outer;
     }
 
     private void addNav(LinearLayout nav, String icon, String label, String target) {
@@ -191,18 +205,26 @@ public final class MainActivity extends Activity {
         LinearLayout item = new LinearLayout(this);
         item.setOrientation(LinearLayout.VERTICAL);
         item.setGravity(Gravity.CENTER);
-        item.setPadding(dp(4), dp(7), dp(4), dp(5));
-        item.setBackground(active
-                ? round(Color.rgb(9, 43, 66), 18)
-                : round(Color.TRANSPARENT, 18));
+        item.setPadding(dp(3), dp(5), dp(3), dp(4));
         item.setClickable(true);
         item.setFocusable(true);
 
-        TextView iconView = text(icon, 21, active ? BLUE : MUTED_2, true);
+        if (active) {
+            GradientDrawable selected = new GradientDrawable(
+                    GradientDrawable.Orientation.TL_BR,
+                    new int[] { Color.rgb(10, 58, 91), Color.rgb(13, 40, 75) });
+            selected.setCornerRadius(dp(18));
+            selected.setStroke(dp(1), Color.rgb(23, 107, 161));
+            item.setBackground(selected);
+        } else {
+            item.setBackground(round(Color.TRANSPARENT, 18));
+        }
+
+        TextView iconView = text(icon, 20, active ? BLUE : MUTED_2, true);
         iconView.setGravity(Gravity.CENTER);
         item.addView(iconView);
 
-        TextView labelView = text(label, 10, active ? Color.WHITE : MUTED, active);
+        TextView labelView = text(label, 9, active ? Color.WHITE : MUTED, active);
         labelView.setGravity(Gravity.CENTER);
         item.addView(labelView);
 
@@ -212,7 +234,7 @@ public final class MainActivity extends Activity {
             renderShell();
         });
 
-        nav.addView(item, new LinearLayout.LayoutParams(0, dp(58), 1f));
+        nav.addView(item, new LinearLayout.LayoutParams(0, dp(54), 1f));
     }
 
     private void renderPage() {
@@ -234,88 +256,7 @@ public final class MainActivity extends Activity {
     }
 
     private void renderHome() {
-        screenHeader(
-                "Защита соединения",
-                "Умный VPN-клиент с автоматическим handover между Wi‑Fi и LTE/5G");
-
-        LinearLayout hero = cardGradient();
-        hero.setPadding(dp(20), dp(18), dp(20), dp(20));
-
-        LinearLayout statusRow = new LinearLayout(this);
-        statusRow.setGravity(Gravity.CENTER_VERTICAL);
-
-        TextView dot = text("●", 13, VisionState.running ? MINT : MUTED_2, true);
-        statusRow.addView(dot);
-
-        headerStatus = text(statusLabel(), 11,
-                VisionState.running ? MINT : MUTED, true);
-        headerStatus.setPadding(dp(7), 0, 0, 0);
-        headerStatus.setLetterSpacing(.08f);
-        statusRow.addView(headerStatus);
-
-        Space statusSpace = new Space(this);
-        statusRow.addView(statusSpace, new LinearLayout.LayoutParams(0, 1, 1f));
-
-        TextView auto = text("AUTO", 10, BLUE, true);
-        auto.setPadding(dp(10), dp(4), dp(10), dp(4));
-        auto.setBackground(roundStroke(Color.rgb(11, 48, 73), Color.rgb(22, 80, 113), 999, 1));
-        statusRow.addView(auto);
-
-        hero.addView(statusRow);
-
-        TextView title = text(
-                VisionState.running ? "Соединение защищено" : "Готов к подключению",
-                27, Color.WHITE, true);
-        title.setPadding(0, dp(16), 0, dp(2));
-        hero.addView(title);
-
-        TextView subtitle = text(
-                "VISION Secure сам выберет лучший доступный маршрут и восстановит туннель при смене сети.",
-                13, MUTED, false);
-        subtitle.setLineSpacing(0, 1.15f);
-        hero.addView(subtitle);
-
-        LinearLayout orbRow = new LinearLayout(this);
-        orbRow.setGravity(Gravity.CENTER);
-        orbRow.setPadding(0, dp(16), 0, dp(14));
-
-        TextView orb = text("V", 35, Color.WHITE, true);
-        orb.setGravity(Gravity.CENTER);
-        GradientDrawable orbBg = new GradientDrawable(
-                GradientDrawable.Orientation.TL_BR,
-                new int[] { Color.rgb(28, 170, 255), Color.rgb(24, 103, 208) });
-        orbBg.setShape(GradientDrawable.OVAL);
-        orb.setBackground(orbBg);
-        orb.setElevation(dp(8));
-        orbRow.addView(orb, new LinearLayout.LayoutParams(dp(96), dp(96)));
-        hero.addView(orbRow);
-
-        powerButton = new Button(this);
-        powerButton.setAllCaps(false);
-        powerButton.setTextSize(15);
-        powerButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        powerButton.setGravity(Gravity.CENTER);
-        powerButton.setMinHeight(0);
-        powerButton.setPadding(dp(18), dp(15), dp(18), dp(15));
-        powerButton.setOnClickListener(v -> toggleVpn());
-        hero.addView(powerButton, new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dp(58)));
-        syncPowerButton();
-
-        content.addView(hero, cardMargin(12));
-
-        LinearLayout stats = new LinearLayout(this);
-        stats.setOrientation(LinearLayout.HORIZONTAL);
-        stats.setWeightSum(3f);
-
-        downloadMetric = text("0.0 МБ", 16, Color.WHITE, true);
-        uploadMetric = text("0.0 МБ", 16, Color.WHITE, true);
-        rttMetric = text("—", 16, Color.WHITE, true);
-
-        stats.addView(metricCard("↓", "Получено", downloadMetric, BLUE), weightCardParams(1f, 0, 6));
-        stats.addView(metricCard("↑", "Отправлено", uploadMetric, MINT), weightCardParams(1f, 6, 6));
-        stats.addView(metricCard("⌁", "RTT", rttMetric, WARNING), weightCardParams(1f, 6, 0));
-        content.addView(stats, cardMargin(12));
+        boolean connected = VisionState.running || VisionState.connecting;
 
         String profileName = "Профиль не выбран";
         String protocol = "Добавьте профиль";
@@ -325,64 +266,181 @@ public final class MainActivity extends Activity {
             protocol = ProtocolDetector.displayName(p.protocol);
         } catch (Exception ignored) {}
 
-        LinearLayout profile = featureCard(
-                "Активный профиль",
-                profileName,
-                protocol,
-                "›",
-                BLUE);
-        profile.setOnClickListener(v -> {
+        LinearLayout hero = cardGradient();
+        hero.setPadding(dp(18), dp(16), dp(18), dp(18));
+
+        LinearLayout top = new LinearLayout(this);
+        top.setGravity(Gravity.CENTER_VERTICAL);
+
+        LinearLayout stateText = new LinearLayout(this);
+        stateText.setOrientation(LinearLayout.VERTICAL);
+        stateText.addView(text("СОЕДИНЕНИЕ", 9, MUTED_2, true));
+        TextView title = text(connected ? "Соединение защищено" : "Готов к подключению",
+                22, Color.WHITE, true);
+        title.setPadding(0, dp(2), 0, 0);
+        stateText.addView(title);
+        stateText.addView(text(profileName + " • " + protocol, 12, MUTED, false));
+        top.addView(stateText, new LinearLayout.LayoutParams(0, -2, 1f));
+
+        rttMetric = text(VisionState.lastRttMs >= 0 ? VisionState.lastRttMs + " мс" : "—",
+                11, BLUE, true);
+        rttMetric.setGravity(Gravity.CENTER);
+        rttMetric.setPadding(dp(11), dp(6), dp(11), dp(6));
+        rttMetric.setBackground(round(Color.rgb(8, 43, 70), 999));
+        top.addView(rttMetric);
+        hero.addView(top);
+
+        FrameLayout powerArea = new FrameLayout(this);
+        powerArea.setPadding(0, dp(12), 0, dp(6));
+
+        View ring3 = new View(this);
+        ring3.setBackground(circleStroke(Color.rgb(17, 67, 113), 2));
+        FrameLayout.LayoutParams r3 = new FrameLayout.LayoutParams(dp(174), dp(174), Gravity.CENTER);
+        powerArea.addView(ring3, r3);
+
+        View ring2 = new View(this);
+        ring2.setBackground(circleStroke(Color.rgb(19, 116, 176), 2));
+        ring2.setAlpha(.72f);
+        FrameLayout.LayoutParams r2 = new FrameLayout.LayoutParams(dp(148), dp(148), Gravity.CENTER);
+        powerArea.addView(ring2, r2);
+
+        View glow = new View(this);
+        glow.setBackground(circleStroke(
+                connected ? Color.rgb(33, 239, 194) : Color.rgb(46, 174, 255), 4));
+        glow.setAlpha(.48f);
+        glow.setElevation(dp(10));
+        FrameLayout.LayoutParams rg = new FrameLayout.LayoutParams(dp(126), dp(126), Gravity.CENTER);
+        powerArea.addView(glow, rg);
+
+        powerButton = new Button(this);
+        powerButton.setAllCaps(false);
+        powerButton.setText("⏻");
+        powerButton.setTextSize(40);
+        powerButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        powerButton.setGravity(Gravity.CENTER);
+        powerButton.setMinWidth(0);
+        powerButton.setMinHeight(0);
+        powerButton.setPadding(0, 0, 0, dp(3));
+        powerButton.setOnClickListener(v -> toggleVpn());
+        powerButton.setElevation(dp(14));
+        FrameLayout.LayoutParams pb = new FrameLayout.LayoutParams(dp(106), dp(106), Gravity.CENTER);
+        powerArea.addView(powerButton, pb);
+
+        hero.addView(powerArea, new LinearLayout.LayoutParams(-1, dp(190)));
+
+        headerStatus = text(
+                VisionState.connecting ? "ПОДКЛЮЧЕНИЕ…" : (VisionState.running ? "ПОДКЛЮЧЕНО" : "НЕ ПОДКЛЮЧЕНО"),
+                12,
+                connected ? MINT : MUTED,
+                true);
+        headerStatus.setGravity(Gravity.CENTER);
+        headerStatus.setLetterSpacing(.08f);
+        hero.addView(headerStatus);
+
+        TextView hint = text(
+                connected ? "Нажмите на кнопку, чтобы отключиться" : "Одно нажатие — и соединение защищено",
+                11, MUTED_2, false);
+        hint.setGravity(Gravity.CENTER);
+        hint.setPadding(0, dp(2), 0, 0);
+        hero.addView(hint);
+
+        content.addView(hero, cardMargin(6));
+        syncPowerButton();
+
+        LinearLayout server = card();
+        server.setPadding(dp(14), dp(13), dp(14), dp(13));
+        LinearLayout serverRow = new LinearLayout(this);
+        serverRow.setGravity(Gravity.CENTER_VERTICAL);
+
+        TextView flag = text("◈", 22, BLUE, true);
+        flag.setGravity(Gravity.CENTER);
+        flag.setBackground(round(Color.rgb(9, 42, 72), 14));
+        serverRow.addView(flag, new LinearLayout.LayoutParams(dp(44), dp(44)));
+
+        LinearLayout labels = new LinearLayout(this);
+        labels.setOrientation(LinearLayout.VERTICAL);
+        labels.setPadding(dp(12), 0, 0, 0);
+        labels.addView(text(profileName, 15, Color.WHITE, true));
+        labels.addView(text(protocol + " • " + networkLabel(VisionState.network), 11, MUTED, false));
+        serverRow.addView(labels, new LinearLayout.LayoutParams(0, -2, 1f));
+
+        TextView ping = text(VisionState.lastRttMs >= 0 ? "⌁ " + VisionState.lastRttMs + " мс" : "AUTO",
+                10, MINT, true);
+        serverRow.addView(ping);
+        serverRow.addView(text("  ›", 20, MUTED_2, false));
+
+        server.setOnClickListener(v -> {
             page = "profiles";
             renderShell();
         });
-        content.addView(profile, cardMargin(12));
+        server.setClickable(true);
+        server.addView(serverRow);
+        content.addView(server, cardMargin(10));
 
-        LinearLayout networkCard = card();
-        networkCard.setPadding(dp(17), dp(15), dp(17), dp(16));
+        LinearLayout traffic = new LinearLayout(this);
+        traffic.setOrientation(LinearLayout.HORIZONTAL);
+        traffic.setWeightSum(2f);
 
-        LinearLayout networkHead = new LinearLayout(this);
-        networkHead.setGravity(Gravity.CENTER_VERTICAL);
-        TextView networkIcon = text("⌁", 22, MINT, true);
-        networkHead.addView(networkIcon);
-        LinearLayout networkText = new LinearLayout(this);
-        networkText.setOrientation(LinearLayout.VERTICAL);
-        networkText.setPadding(dp(12), 0, 0, 0);
-        networkText.addView(text("Текущая сеть", 11, MUTED, true));
-        network = text(networkLabel(VisionState.network), 18, Color.WHITE, true);
-        networkText.addView(network);
-        networkHead.addView(networkText, new LinearLayout.LayoutParams(0, -2, 1f));
-        TextView handover = text("HANDOVER", 9, MINT, true);
-        handover.setPadding(dp(9), dp(4), dp(9), dp(4));
-        handover.setBackground(round(Color.rgb(7, 48, 43), 999));
-        networkHead.addView(handover);
-        networkCard.addView(networkHead);
+        downloadMetric = text(String.format(Locale.ROOT, "%.1f МБ",
+                VisionState.downloaded.get() / 1048576.0), 19, Color.WHITE, true);
+        uploadMetric = text(String.format(Locale.ROOT, "%.1f МБ",
+                VisionState.uploaded.get() / 1048576.0), 19, Color.WHITE, true);
+
+        traffic.addView(metricCard("↓", "СКАЧАНО", downloadMetric, Color.rgb(35, 213, 255)),
+                weightCardParams(1f, 0, 5));
+        traffic.addView(metricCard("↑", "ОТПРАВЛЕНО", uploadMetric, Color.rgb(185, 71, 255)),
+                weightCardParams(1f, 5, 0));
+        content.addView(traffic, cardMargin(10));
+
+        LinearLayout details = card();
+        details.setPadding(dp(15), dp(13), dp(15), dp(13));
+        details.addView(detailRow("Протокол", protocol, BLUE));
 
         endpointText = text(
                 VisionState.endpoint == null || VisionState.endpoint.isEmpty()
-                        ? "Endpoint появится после подключения"
-                        : VisionState.endpoint,
-                12, MUTED, false);
-        endpointText.setPadding(0, dp(12), 0, 0);
-        networkCard.addView(endpointText);
-        content.addView(networkCard, cardMargin(12));
+                        ? "После подключения" : VisionState.endpoint,
+                12, Color.WHITE, true);
+        details.addView(detailRow("Endpoint", endpointText.getText().toString(), MUTED));
 
-        LinearLayout routing = featureCard(
-                "Маршрутизация",
-                routingTitle(),
+        network = text(networkLabel(VisionState.network), 12, Color.WHITE, true);
+        details.addView(detailRow("Сеть", network.getText().toString(), MINT));
+        details.addView(detailRow("Защита", connected ? "Активна" : "Готова", MINT));
+
+        content.addView(details, cardMargin(10));
+
+        LinearLayout access = featureCard(
+                "МАРШРУТИЗАЦИЯ",
+                "Доступ ко всем сервисам",
                 routingSubtitle(),
                 "›",
                 MINT);
-        routing.setOnClickListener(v -> {
+        access.setOnClickListener(v -> {
             page = "routes";
             renderShell();
         });
-        content.addView(routing, cardMargin(12));
+        content.addView(access, cardMargin(10));
     }
 
     private void renderProfiles() {
-        screenHeader(
-                "Профили",
-                "Единое управление VISION Secure, WireGuard, AmneziaWG и импортируемыми конфигурациями");
+        screenHeader("Профили", "Быстрое переключение между подключениями");
+
+        LinearLayout toolbar = new LinearLayout(this);
+        toolbar.setOrientation(LinearLayout.HORIZONTAL);
+        toolbar.setGravity(Gravity.CENTER_VERTICAL);
+
+        EditText search = darkInput("Поиск профилей");
+        search.setEnabled(false);
+        search.setAlpha(.78f);
+        toolbar.addView(search, new LinearLayout.LayoutParams(0, dp(46), 1f));
+
+        TextView plus = text("+", 24, Color.WHITE, true);
+        plus.setGravity(Gravity.CENTER);
+        plus.setBackground(roundStroke(Color.rgb(10, 39, 65), Color.rgb(30, 82, 126), 15, 1));
+        plus.setOnClickListener(v -> showUrlImport());
+        toolbar.addView(plus, new LinearLayout.LayoutParams(dp(46), dp(46)));
+        ((LinearLayout.LayoutParams) plus.getLayoutParams()).setMargins(dp(8), 0, 0, 0);
+
+        content.addView(toolbar, cardMargin(8));
 
         try {
             UnifiedProfile active = ProfileStore.active(this);
@@ -391,8 +449,8 @@ public final class MainActivity extends Activity {
             if (all.isEmpty()) {
                 content.addView(emptyState(
                         "Профилей пока нет",
-                        "Добавьте профиль по QR-коду, ссылке, файлу или вставьте конфигурацию."),
-                        cardMargin(12));
+                        "Добавьте конфигурацию по QR-коду, ссылке или файлу."),
+                        cardMargin(10));
             }
 
             for (UnifiedProfile p : all) {
@@ -425,52 +483,62 @@ public final class MainActivity extends Activity {
                             .show();
                     return true;
                 });
-                content.addView(c, cardMargin(10));
+                content.addView(c, cardMargin(9));
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            content.addView(emptyState(
+                    "Профилей пока нет",
+                    "Добавьте конфигурацию по QR-коду, ссылке или файлу."),
+                    cardMargin(10));
+        }
 
-        sectionLabel("ДОБАВИТЬ ПРОФИЛЬ");
+        sectionLabel("ДОБАВИТЬ");
 
         LinearLayout quick = new LinearLayout(this);
         quick.setOrientation(LinearLayout.HORIZONTAL);
-        quick.setWeightSum(2f);
+        quick.setWeightSum(3f);
 
-        quick.addView(quickAction("▦", "QR-код", "Сканировать", this::scanQr, BLUE),
-                weightCardParams(1f, 0, 6));
-        quick.addView(quickAction("⇧", "Файл", ".conf / .ovpn / JSON", () -> {
+        quick.addView(quickAction("+", "Ссылка", "URL", this::showUrlImport, BLUE),
+                weightCardParams(1f, 0, 4));
+        quick.addView(quickAction("▦", "QR-код", "Камера", this::scanQr, MINT),
+                weightCardParams(1f, 4, 4));
+        quick.addView(quickAction("⇩", "Файл", "Импорт", () -> {
             if (ensureDisconnected()) {
                 Intent open = new Intent(Intent.ACTION_OPEN_DOCUMENT)
                         .setType("*/*")
                         .addCategory(Intent.CATEGORY_OPENABLE);
                 startActivityForResult(open, IMPORT_FILE);
             }
-        }, MINT), weightCardParams(1f, 6, 0));
-        content.addView(quick, cardMargin(10));
+        }, Color.rgb(158, 92, 255)), weightCardParams(1f, 4, 0));
 
-        action("＋", "Добавить по ссылке", "Подписка VISION или URL конфигурации", this::showUrlImport);
-        action("⌘", "Вставить конфигурацию", "Полный конфиг, URI или текст профиля", this::showPaste);
-        action("↻", "Обновить активный VISION-профиль", "Получить свежие endpoint и политики", this::updateSubscription);
+        content.addView(quick, cardMargin(8));
+
+        action("⌘", "Вставить конфигурацию",
+                "Полный конфиг, URI или текст профиля", this::showPaste);
+        action("↻", "Обновить профиль",
+                "Получить свежий endpoint и политики", this::updateSubscription);
 
         sectionLabel("ДВИЖКИ");
-
-        content.addView(engineCard("VISION Secure", "WSS/TLS • авто-handover", true, BLUE), cardMargin(10));
-        content.addView(engineCard("WireGuard", "Нативный userspace backend", true, MINT), cardMargin(10));
-        content.addView(engineCard("AmneziaWG", "Встроенный AWG backend", true, MINT), cardMargin(10));
-        content.addView(engineCard("OpenVPN / Xray", "Профили сохраняются для Engine Pack", false, MUTED), cardMargin(10));
+        content.addView(engineCard("VISION Secure", "WSS / TLS", true, BLUE), cardMargin(8));
+        content.addView(engineCard("WireGuard", "Нативный userspace backend", true, MINT), cardMargin(8));
+        content.addView(engineCard("AmneziaWG", "Встроенный AWG backend", true, Color.rgb(95, 142, 255)), cardMargin(8));
+        content.addView(engineCard("OpenVPN / Xray", "Engine Pack", false, MUTED), cardMargin(8));
     }
 
     private void renderRoutes() {
-        screenHeader(
-                "Маршруты",
-                "Split tunneling по приложениям, IP/CIDR и доменам");
+        screenHeader("Маршруты", "Какие приложения и адреса идут через VPN");
 
         sectionLabel("ПРИЛОЖЕНИЯ");
-        RadioGroup apps = optionGroup();
 
+        LinearLayout appsCard = card();
+        appsCard.setPadding(dp(12), dp(10), dp(12), dp(10));
+
+        RadioGroup apps = optionGroup();
         String mode = RoutingPreferences.mode(this);
+
         RadioButton all = radio("Все приложения по правилам VPN",
                 RoutingPreferences.MODE_ALL.equals(mode));
-        RadioButton only = radio("Только выбранные приложения через VPN",
+        RadioButton only = radio("Только выбранные через VPN",
                 RoutingPreferences.MODE_ONLY.equals(mode));
         RadioButton bypass = radio("Выбранные приложения без VPN",
                 RoutingPreferences.MODE_BYPASS.equals(mode));
@@ -483,112 +551,122 @@ public final class MainActivity extends Activity {
         only.setOnClickListener(v -> RoutingPreferences.setMode(this, RoutingPreferences.MODE_ONLY));
         bypass.setOnClickListener(v -> RoutingPreferences.setMode(this, RoutingPreferences.MODE_BYPASS));
 
-        content.addView(apps, cardMargin(10));
-        action("◉", "Выбрать приложения",
+        appsCard.addView(apps);
+        content.addView(appsCard, cardMargin(8));
+
+        action("◉", "Приложения",
                 RoutingPreferences.packages(this).size() + " выбрано", this::chooseApps);
 
-        sectionLabel("ТРАФИК");
-        RadioGroup routes = optionGroup();
+        sectionLabel("МАРШРУТИЗАЦИЯ");
 
+        LinearLayout routeMode = card();
+        routeMode.setPadding(dp(12), dp(10), dp(12), dp(10));
+        RadioGroup routes = optionGroup();
         String rm = RoutingPreferences.routeMode(this);
-        RadioButton rall = radio("Весь IPv4-трафик через VPN, кроме исключений",
+
+        RadioButton rall = radio("Весь трафик через VPN, кроме исключений",
                 RoutingPreferences.ROUTE_ALL.equals(rm));
-        RadioButton ronly = radio("Через VPN только указанные IP/CIDR/домены",
+        RadioButton ronly = radio("Через VPN только указанные правила",
                 RoutingPreferences.ROUTE_ONLY.equals(rm));
 
         routes.addView(rall);
         routes.addView(ronly);
 
-        rall.setOnClickListener(v -> RoutingPreferences.setRouteMode(this, RoutingPreferences.ROUTE_ALL));
-        ronly.setOnClickListener(v -> RoutingPreferences.setRouteMode(this, RoutingPreferences.ROUTE_ONLY));
+        rall.setOnClickListener(v ->
+                RoutingPreferences.setRouteMode(this, RoutingPreferences.ROUTE_ALL));
+        ronly.setOnClickListener(v ->
+                RoutingPreferences.setRouteMode(this, RoutingPreferences.ROUTE_ONLY));
 
-        content.addView(routes, cardMargin(10));
+        routeMode.addView(routes);
 
-        action("↗", "IP/CIDR через VPN", summary(RoutingPreferences.vpnCidrs(this)),
-                () -> editRules("IP/CIDR через VPN", RoutingPreferences.vpnCidrs(this), true,
-                        v -> RoutingPreferences.setVpnCidrs(this, v)));
-
-        action("↘", "IP/CIDR без VPN", summary(RoutingPreferences.bypassCidrs(this)),
-                () -> editRules("IP/CIDR без VPN", RoutingPreferences.bypassCidrs(this), true,
-                        v -> RoutingPreferences.setBypassCidrs(this, v)));
-
-        action("◇", "Домены через VPN", summary(RoutingPreferences.vpnDomains(this)),
-                () -> editRules("Домены через VPN", RoutingPreferences.vpnDomains(this), false,
-                        v -> RoutingPreferences.setVpnDomains(this, v)));
-
-        action("○", "Домены без VPN", summary(RoutingPreferences.bypassDomains(this)),
-                () -> editRules("Домены без VPN", RoutingPreferences.bypassDomains(this), false,
-                        v -> RoutingPreferences.setBypassDomains(this, v)));
-
-        LinearLayout lan = card();
-        lan.setPadding(dp(16), dp(12), dp(16), dp(12));
         CheckBox local = new CheckBox(this);
-        local.setText("Локальные сети (LAN) пускать напрямую");
-        local.setTextColor(Color.WHITE);
-        local.setTextSize(14);
+        local.setText("Локальные сети идут напрямую");
+        local.setTextColor(MUTED);
+        local.setTextSize(12);
         local.setChecked(RoutingPreferences.allowLocalNetwork(this));
         local.setOnCheckedChangeListener((b, v) ->
                 RoutingPreferences.setAllowLocalNetwork(this, v));
-        lan.addView(local);
-        content.addView(lan, cardMargin(10));
+        routeMode.addView(local);
+
+        content.addView(routeMode, cardMargin(8));
+
+        action("↗", "IP/CIDR через VPN", summary(RoutingPreferences.vpnCidrs(this)),
+                () -> editRules("IP/CIDR через VPN",
+                        RoutingPreferences.vpnCidrs(this), true,
+                        v -> RoutingPreferences.setVpnCidrs(this, v)));
+
+        action("↘", "IP/CIDR без VPN", summary(RoutingPreferences.bypassCidrs(this)),
+                () -> editRules("IP/CIDR без VPN",
+                        RoutingPreferences.bypassCidrs(this), true,
+                        v -> RoutingPreferences.setBypassCidrs(this, v)));
+
+        action("◇", "Домены через VPN", summary(RoutingPreferences.vpnDomains(this)),
+                () -> editRules("Домены через VPN",
+                        RoutingPreferences.vpnDomains(this), false,
+                        v -> RoutingPreferences.setVpnDomains(this, v)));
+
+        action("○", "Домены без VPN", summary(RoutingPreferences.bypassDomains(this)),
+                () -> editRules("Домены без VPN",
+                        RoutingPreferences.bypassDomains(this), false,
+                        v -> RoutingPreferences.setBypassDomains(this, v)));
 
         content.addView(callout(
-                "DNS И ДОМЕНЫ",
-                "Доменные правила резолвятся при подключении и обновляются при смене сети.",
-                BLUE), cardMargin(12));
+                "SMART ROUTING",
+                "Правила применяются при подключении и пересчитываются после смены сети.",
+                MINT), cardMargin(10));
     }
 
     private void renderSettings() {
-        screenHeader(
-                "Настройки",
-                "Соединение, системная защита, диагностика и безопасность");
-
-        sectionLabel("ANDROID VPN");
-        action("∞", "Always-on VPN", "Открыть системные параметры Android", this::openVpnSettings);
-        action("⊘", "Блокировать без VPN", "Lockdown настраивается в системном меню", this::openVpnSettings);
+        screenHeader("Настройки", "Безопасность, подключение и внешний вид");
 
         sectionLabel("СОЕДИНЕНИЕ");
-        content.addView(settingsCard(
-                "Wi‑Fi ↔ LTE/5G handover",
-                "VISION Secure отслеживает физическую сеть и восстанавливает туннель после переключения.",
-                MINT), cardMargin(10));
+        action("∞", "Always-on VPN",
+                "Системный режим Android", this::openVpnSettings);
+        action("⊘", "Блокировать без VPN",
+                "Lockdown mode", this::openVpnSettings);
 
         content.addView(settingsCard(
-                "Производительность",
-                "WSS batching, data no-padding и автоматический выбор доступного endpoint.",
-                BLUE), cardMargin(10));
+                "Автоматическое переподключение",
+                "Wi‑Fi ↔ LTE/5G handover активен",
+                MINT), cardMargin(8));
+
+        content.addView(settingsCard(
+                "Выбор протокола",
+                "Активный профиль определяет VPN-движок",
+                BLUE), cardMargin(8));
 
         sectionLabel("БЕЗОПАСНОСТЬ");
         content.addView(settingsCard(
-                "TLS 1.3 и проверка сертификата",
-                "Проверка TLS не отключается. Профили защищены AES-GCM и Android Keystore.",
-                MINT), cardMargin(10));
+                "TLS 1.3 + Android Keystore",
+                "Профили защищены AES-GCM",
+                MINT), cardMargin(8));
 
         content.addView(settingsCard(
                 "VISION Control",
-                "Клиент готов отправлять телеметрию состояния и сети в Control.",
-                BLUE), cardMargin(10));
+                "Статус, RTT и сетевые события",
+                Color.rgb(98, 116, 255)), cardMargin(8));
+
+        sectionLabel("ДИАГНОСТИКА");
+        content.addView(settingsCard(
+                "Состояние соединения",
+                VisionState.running ? "VPN активен" : "Ошибок подключения сейчас нет",
+                VisionState.running ? MINT : BLUE), cardMargin(8));
 
         sectionLabel("О ПРИЛОЖЕНИИ");
         LinearLayout version = infoCard(
                 "VERSION",
-                "VISION VPN 1.1 UI",
-                "Unified Profiles • WG/AWG • Routing • Handover");
-        content.addView(version, cardMargin(10));
+                "VISION VPN — Neon UI",
+                "Unified Profiles • WG/AWG • Routes • Handover");
+        content.addView(version, cardMargin(8));
     }
 
     private void screenHeader(String title, String subtitle) {
-        TextView kicker = text("VISION / " + page.toUpperCase(Locale.ROOT), 10, BLUE, true);
-        kicker.setLetterSpacing(.12f);
-        kicker.setPadding(0, dp(6), 0, dp(6));
-        content.addView(kicker);
-
-        TextView h = text(title, 29, Color.WHITE, true);
-        h.setPadding(0, 0, 0, dp(3));
+        TextView h = text(title, 27, Color.WHITE, true);
+        h.setPadding(dp(1), dp(4), 0, 0);
         content.addView(h);
 
-        TextView s = text(subtitle, 13, MUTED, false);
-        s.setLineSpacing(0, 1.12f);
+        TextView s = text(subtitle, 12, MUTED, false);
+        s.setPadding(dp(1), dp(1), 0, dp(2));
         content.addView(s);
     }
 
@@ -602,81 +680,97 @@ public final class MainActivity extends Activity {
     private LinearLayout profileCard(UnifiedProfile p, boolean selected) {
         LinearLayout c = new LinearLayout(this);
         c.setOrientation(LinearLayout.VERTICAL);
-        c.setPadding(dp(17), dp(15), dp(17), dp(15));
-        c.setBackground(roundStroke(
-                selected ? Color.rgb(9, 39, 59) : SURFACE,
-                selected ? BLUE_SOFT : BORDER,
-                22, 1));
+        c.setPadding(dp(14), dp(13), dp(14), dp(13));
 
-        LinearLayout top = new LinearLayout(this);
-        top.setGravity(Gravity.CENTER_VERTICAL);
+        GradientDrawable bg = new GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                selected
+                        ? new int[] { Color.rgb(10, 45, 75), Color.rgb(16, 34, 65) }
+                        : new int[] { Color.rgb(7, 19, 35), Color.rgb(9, 23, 42) });
+        bg.setCornerRadius(dp(20));
+        bg.setStroke(dp(1),
+                selected ? Color.rgb(38, 195, 242) : Color.rgb(25, 52, 82));
+        c.setBackground(bg);
+        c.setElevation(selected ? dp(5) : dp(1));
 
-        TextView proto = text(ProtocolDetector.displayName(p.protocol), 10,
-                selected ? BLUE : MUTED, true);
-        proto.setPadding(dp(9), dp(4), dp(9), dp(4));
-        proto.setBackground(round(
-                selected ? Color.rgb(9, 52, 78) : Color.rgb(13, 35, 53), 999));
-        top.addView(proto);
+        LinearLayout row = new LinearLayout(this);
+        row.setGravity(Gravity.CENTER_VERTICAL);
 
-        Space space = new Space(this);
-        top.addView(space, new LinearLayout.LayoutParams(0, 1, 1f));
+        TextView icon = text(selected ? "◆" : "◇", 22,
+                selected ? BLUE : MUTED_2, true);
+        icon.setGravity(Gravity.CENTER);
+        icon.setBackground(round(
+                selected ? Color.rgb(9, 55, 84) : Color.rgb(11, 31, 51), 14));
+        row.addView(icon, new LinearLayout.LayoutParams(dp(44), dp(44)));
+
+        LinearLayout labels = new LinearLayout(this);
+        labels.setOrientation(LinearLayout.VERTICAL);
+        labels.setPadding(dp(12), 0, 0, 0);
+        labels.addView(text(p.name, 15, Color.WHITE, true));
+        labels.addView(text(ProtocolDetector.displayName(p.protocol),
+                11, MUTED, false));
+        row.addView(labels, new LinearLayout.LayoutParams(0, -2, 1f));
 
         if (selected) {
-            TextView active = text("● АКТИВЕН", 10, MINT, true);
-            top.addView(active);
+            TextView active = text("АКТИВЕН", 9, MINT, true);
+            active.setPadding(dp(9), dp(5), dp(9), dp(5));
+            active.setBackground(round(Color.rgb(5, 48, 41), 999));
+            row.addView(active);
+        } else {
+            row.addView(text("›", 22, MUTED_2, false));
         }
 
-        c.addView(top);
-
-        TextView name = text(p.name, 18, Color.WHITE, true);
-        name.setPadding(0, dp(10), 0, dp(3));
-        c.addView(name);
-
-        c.addView(text(
-                selected ? "Используется для следующего подключения" : "Нажмите, чтобы сделать активным",
-                12, MUTED, false));
-
+        c.addView(row);
         return c;
     }
 
     private LinearLayout quickAction(
             String icon, String title, String subtitle, Runnable click, int accent) {
         LinearLayout c = card();
-        c.setPadding(dp(15), dp(15), dp(15), dp(15));
+        c.setGravity(Gravity.CENTER_HORIZONTAL);
+        c.setPadding(dp(8), dp(11), dp(8), dp(10));
         c.setClickable(true);
         c.setFocusable(true);
         c.setOnClickListener(v -> click.run());
 
-        TextView iconView = text(icon, 22, accent, true);
-        c.addView(iconView);
-        c.addView(text(title, 16, Color.WHITE, true));
-        c.addView(text(subtitle, 11, MUTED, false));
+        TextView iconView = text(icon, 20, accent, true);
+        iconView.setGravity(Gravity.CENTER);
+        iconView.setBackground(round(Color.rgb(10, 34, 57), 13));
+        c.addView(iconView, new LinearLayout.LayoutParams(dp(38), dp(38)));
+
+        TextView t = text(title, 12, Color.WHITE, true);
+        t.setGravity(Gravity.CENTER);
+        c.addView(t);
+
+        TextView s = text(subtitle, 9, MUTED_2, false);
+        s.setGravity(Gravity.CENTER);
+        c.addView(s);
         return c;
     }
 
     private LinearLayout engineCard(
             String name, String detail, boolean ready, int accent) {
         LinearLayout c = card();
-        c.setPadding(dp(16), dp(13), dp(16), dp(13));
+        c.setPadding(dp(14), dp(12), dp(14), dp(12));
 
         LinearLayout row = new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
 
-        TextView marker = text("●", 11, ready ? accent : MUTED_2, true);
-        row.addView(marker);
+        TextView icon = text("●", 12, ready ? accent : MUTED_2, true);
+        row.addView(icon);
 
         LinearLayout labels = new LinearLayout(this);
         labels.setOrientation(LinearLayout.VERTICAL);
         labels.setPadding(dp(10), 0, 0, 0);
-        labels.addView(text(name, 15, Color.WHITE, true));
-        labels.addView(text(detail, 11, MUTED, false));
+        labels.addView(text(name, 14, Color.WHITE, true));
+        labels.addView(text(detail, 10, MUTED, false));
         row.addView(labels, new LinearLayout.LayoutParams(0, -2, 1f));
 
-        TextView state = text(ready ? "READY" : "PACK", 9,
+        TextView state = text(ready ? "ГОТОВ" : "PACK", 9,
                 ready ? MINT : MUTED, true);
-        state.setPadding(dp(9), dp(4), dp(9), dp(4));
+        state.setPadding(dp(8), dp(5), dp(8), dp(5));
         state.setBackground(round(
-                ready ? Color.rgb(7, 47, 42) : Color.rgb(20, 35, 49), 999));
+                ready ? Color.rgb(4, 47, 40) : Color.rgb(18, 31, 47), 999));
         row.addView(state);
 
         c.addView(row);
@@ -685,37 +779,45 @@ public final class MainActivity extends Activity {
 
     private LinearLayout settingsCard(String title, String detail, int accent) {
         LinearLayout c = card();
-        c.setPadding(dp(16), dp(15), dp(16), dp(15));
+        c.setPadding(dp(14), dp(13), dp(14), dp(13));
 
         LinearLayout row = new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
 
-        TextView marker = text("●", 10, accent, true);
-        row.addView(marker);
+        TextView icon = text("◉", 15, accent, true);
+        icon.setGravity(Gravity.CENTER);
+        icon.setBackground(round(Color.rgb(10, 32, 53), 12));
+        row.addView(icon, new LinearLayout.LayoutParams(dp(38), dp(38)));
 
-        TextView t = text(title, 15, Color.WHITE, true);
-        t.setPadding(dp(10), 0, 0, 0);
-        row.addView(t);
+        LinearLayout labels = new LinearLayout(this);
+        labels.setOrientation(LinearLayout.VERTICAL);
+        labels.setPadding(dp(11), 0, 0, 0);
+        labels.addView(text(title, 14, Color.WHITE, true));
+        labels.addView(text(detail, 10, MUTED, false));
+        row.addView(labels, new LinearLayout.LayoutParams(0, -2, 1f));
+
+        TextView state = text("●", 12, accent, true);
+        row.addView(state);
+
         c.addView(row);
-
-        TextView d = text(detail, 12, MUTED, false);
-        d.setPadding(0, dp(8), 0, 0);
-        d.setLineSpacing(0, 1.15f);
-        c.addView(d);
         return c;
     }
 
     private LinearLayout callout(String title, String detail, int accent) {
         LinearLayout c = new LinearLayout(this);
         c.setOrientation(LinearLayout.VERTICAL);
-        c.setPadding(dp(16), dp(14), dp(16), dp(14));
-        c.setBackground(roundStroke(
-                Color.rgb(7, 27, 43),
-                Color.rgb(19, 58, 84),
-                20, 1));
-        c.addView(text(title, 10, accent, true));
-        TextView d = text(detail, 12, MUTED, false);
-        d.setPadding(0, dp(5), 0, 0);
+        c.setPadding(dp(14), dp(12), dp(14), dp(12));
+
+        GradientDrawable g = new GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                new int[] { Color.rgb(7, 25, 43), Color.rgb(9, 35, 54) });
+        g.setCornerRadius(dp(18));
+        g.setStroke(dp(1), Color.rgb(21, 69, 92));
+        c.setBackground(g);
+
+        c.addView(text(title, 9, accent, true));
+        TextView d = text(detail, 11, MUTED, false);
+        d.setPadding(0, dp(4), 0, 0);
         c.addView(d);
         return c;
     }
@@ -737,26 +839,27 @@ public final class MainActivity extends Activity {
     private LinearLayout featureCard(
             String eyebrow, String title, String subtitle, String end, int accent) {
         LinearLayout c = card();
-        c.setPadding(dp(17), dp(14), dp(17), dp(14));
+        c.setPadding(dp(14), dp(12), dp(14), dp(12));
         c.setClickable(true);
         c.setFocusable(true);
 
         LinearLayout row = new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
 
-        TextView accentView = text("●", 10, accent, true);
-        row.addView(accentView);
+        TextView icon = text("◉", 15, accent, true);
+        icon.setGravity(Gravity.CENTER);
+        icon.setBackground(round(Color.rgb(10, 34, 56), 13));
+        row.addView(icon, new LinearLayout.LayoutParams(dp(40), dp(40)));
 
         LinearLayout labels = new LinearLayout(this);
         labels.setOrientation(LinearLayout.VERTICAL);
-        labels.setPadding(dp(10), 0, 0, 0);
-        labels.addView(text(eyebrow.toUpperCase(Locale.ROOT), 9, MUTED_2, true));
-        labels.addView(text(title, 17, Color.WHITE, true));
-        labels.addView(text(subtitle, 12, MUTED, false));
+        labels.setPadding(dp(11), 0, 0, 0);
+        labels.addView(text(eyebrow.toUpperCase(Locale.ROOT), 8, MUTED_2, true));
+        labels.addView(text(title, 14, Color.WHITE, true));
+        labels.addView(text(subtitle, 10, MUTED, false));
         row.addView(labels, new LinearLayout.LayoutParams(0, -2, 1f));
 
-        TextView arrow = text(end, 24, MUTED, false);
-        row.addView(arrow);
+        row.addView(text(end, 21, MUTED_2, false));
         c.addView(row);
         return c;
     }
@@ -764,27 +867,37 @@ public final class MainActivity extends Activity {
     private LinearLayout metricCard(
             String icon, String label, TextView value, int accent) {
         LinearLayout c = card();
-        c.setPadding(dp(13), dp(13), dp(13), dp(13));
-        c.addView(text(icon, 14, accent, true));
+        c.setPadding(dp(13), dp(12), dp(13), dp(11));
+
+        LinearLayout top = new LinearLayout(this);
+        top.setGravity(Gravity.CENTER_VERTICAL);
+        top.addView(text(icon, 14, accent, true));
         TextView l = text(label, 9, MUTED_2, true);
-        l.setLetterSpacing(.06f);
-        c.addView(l);
+        l.setPadding(dp(6), 0, 0, 0);
+        top.addView(l);
+        c.addView(top);
+
+        value.setPadding(0, dp(4), 0, 0);
         c.addView(value);
+
+        TextView wave = text("⌁⌁⌁⌁", 12, accent, false);
+        wave.setAlpha(.72f);
+        c.addView(wave);
         return c;
     }
 
     private RadioGroup optionGroup() {
         RadioGroup group = new RadioGroup(this);
         group.setOrientation(RadioGroup.VERTICAL);
-        group.setPadding(dp(8), dp(8), dp(8), dp(8));
-        group.setBackground(roundStroke(SURFACE, BORDER, 22, 1));
+        group.setPadding(dp(5), dp(4), dp(5), dp(4));
+        group.setBackgroundColor(Color.TRANSPARENT);
         return group;
     }
 
     private void action(
             String icon, String title, String subtitle, Runnable click) {
         LinearLayout c = card();
-        c.setPadding(dp(16), dp(13), dp(15), dp(13));
+        c.setPadding(dp(13), dp(11), dp(13), dp(11));
         c.setClickable(true);
         c.setFocusable(true);
         c.setOnClickListener(v -> click.run());
@@ -792,23 +905,43 @@ public final class MainActivity extends Activity {
         LinearLayout row = new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
 
-        TextView iconView = text(icon, 20, BLUE, true);
+        TextView iconView = text(icon, 18, BLUE, true);
         iconView.setGravity(Gravity.CENTER);
-        iconView.setBackground(round(Color.rgb(10, 47, 70), 14));
-        row.addView(iconView, new LinearLayout.LayoutParams(dp(42), dp(42)));
+        iconView.setBackground(round(Color.rgb(10, 38, 63), 12));
+        row.addView(iconView, new LinearLayout.LayoutParams(dp(40), dp(40)));
 
         LinearLayout labels = new LinearLayout(this);
         labels.setOrientation(LinearLayout.VERTICAL);
-        labels.setPadding(dp(12), 0, 0, 0);
-        labels.addView(text(title, 15, Color.WHITE, true));
-        labels.addView(text(subtitle, 11, MUTED, false));
+        labels.setPadding(dp(11), 0, 0, 0);
+        labels.addView(text(title, 14, Color.WHITE, true));
+        labels.addView(text(subtitle, 10, MUTED, false));
         row.addView(labels, new LinearLayout.LayoutParams(0, -2, 1f));
 
-        row.addView(text("›", 24, MUTED, false));
+        row.addView(text("›", 21, MUTED_2, false));
         c.addView(row);
-        content.addView(c, cardMargin(9));
+        content.addView(c, cardMargin(8));
     }
 
+    private GradientDrawable circleStroke(int stroke, int width) {
+        GradientDrawable d = new GradientDrawable();
+        d.setColor(Color.TRANSPARENT);
+        d.setShape(GradientDrawable.OVAL);
+        d.setStroke(dp(width), stroke);
+        return d;
+    }
+
+    private LinearLayout detailRow(String label, String value, int accent) {
+        LinearLayout row = new LinearLayout(this);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(0, dp(7), 0, dp(7));
+
+        TextView l = text(label, 11, MUTED, false);
+        row.addView(l, new LinearLayout.LayoutParams(0, -2, 1f));
+
+        TextView v = text(value, 11, accent == MUTED ? Color.WHITE : accent, true);
+        row.addView(v);
+        return row;
+    }
     private void openVpnSettings() {
         try {
             startActivity(new Intent(Settings.ACTION_VPN_SETTINGS));
@@ -1087,8 +1220,14 @@ public final class MainActivity extends Activity {
     private LinearLayout card() {
         LinearLayout c = new LinearLayout(this);
         c.setOrientation(LinearLayout.VERTICAL);
-        c.setBackground(roundStroke(SURFACE, BORDER, 22, 1));
-        c.setElevation(dp(1));
+
+        GradientDrawable g = new GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                new int[] { Color.rgb(7, 18, 34), Color.rgb(9, 24, 43) });
+        g.setCornerRadius(dp(20));
+        g.setStroke(dp(1), Color.rgb(24, 50, 79));
+        c.setBackground(g);
+        c.setElevation(dp(2));
         return c;
     }
 
@@ -1099,14 +1238,14 @@ public final class MainActivity extends Activity {
         GradientDrawable g = new GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
                 new int[] {
-                        Color.rgb(10, 37, 57),
-                        Color.rgb(7, 25, 42),
-                        Color.rgb(8, 31, 54)
+                        Color.rgb(7, 25, 45),
+                        Color.rgb(5, 15, 31),
+                        Color.rgb(15, 18, 48)
                 });
-        g.setCornerRadius(dp(28));
-        g.setStroke(dp(1), Color.rgb(22, 66, 95));
+        g.setCornerRadius(dp(26));
+        g.setStroke(dp(1), Color.rgb(22, 83, 126));
         c.setBackground(g);
-        c.setElevation(dp(3));
+        c.setElevation(dp(6));
         return c;
     }
 
@@ -1184,12 +1323,25 @@ public final class MainActivity extends Activity {
         if (powerButton == null) return;
 
         boolean on = VisionState.running || VisionState.connecting;
-        powerButton.setText(
-                VisionState.connecting
-                        ? "ПОДКЛЮЧЕНИЕ…"
-                        : (on ? "ОТКЛЮЧИТЬ VPN" : "ПОДКЛЮЧИТЬ VPN"));
-        powerButton.setTextColor(on ? Color.rgb(3, 33, 28) : Color.WHITE);
-        powerButton.setBackground(round(on ? MINT : BLUE, 18));
+        powerButton.setText("⏻");
+        powerButton.setTextColor(Color.WHITE);
+
+        GradientDrawable orb = new GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                on
+                        ? new int[] {
+                                Color.rgb(29, 221, 213),
+                                Color.rgb(35, 157, 255),
+                                Color.rgb(136, 62, 255)
+                        }
+                        : new int[] {
+                                Color.rgb(30, 129, 255),
+                                Color.rgb(74, 78, 230),
+                                Color.rgb(132, 52, 255)
+                        });
+        orb.setShape(GradientDrawable.OVAL);
+        orb.setStroke(dp(2), on ? Color.rgb(89, 255, 213) : Color.rgb(66, 195, 255));
+        powerButton.setBackground(orb);
         powerButton.setEnabled(!fetching);
         powerButton.setAlpha(fetching ? .65f : 1f);
     }
